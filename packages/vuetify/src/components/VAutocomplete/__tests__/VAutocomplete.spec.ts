@@ -11,14 +11,25 @@ import {
 describe('VAutocomplete.ts', () => {
   type Instance = InstanceType<typeof VAutocomplete>
   let mountFunction: (options?: object) => Wrapper<Instance>
-  // const app = document.createElement('div')
-  // app.setAttribute('data-app', true)
-  // document.body.appendChild(app)
+  let el
 
   beforeEach(() => {
+    el = document.createElement('div')
+    el.setAttribute('data-app', 'true')
+    document.body.appendChild(el)
     mountFunction = (options = {}) => {
       return mount(VAutocomplete, {
-        ...options
+        ...options,
+        mocks: {
+          $vuetify: {
+            lang: {
+              t: (val: string) => val
+            },
+            theme: {
+              dark: false
+            }
+          }
+        }
       })
     }
   })
@@ -526,25 +537,5 @@ describe('VAutocomplete.ts', () => {
     input.trigger('keydown.delete')
 
     expect(wrapper.vm.internalValue).toEqual(['foo'])
-  })
-
-  it('should not filter results', async () => {
-    const wrapper = mountFunction({
-      propsData: {
-        items: ['foo', 'bar']
-      }
-    })
-
-    const input = wrapper.find('input')
-    input.element.value = 'foo'
-    input.trigger('input')
-
-    expect(wrapper.vm.filteredItems).toHaveLength(1)
-
-    wrapper.setProps({ noFilter: true })
-
-    await wrapper.vm.$nextTick()
-
-    expect(wrapper.vm.filteredItems).toHaveLength(2)
   })
 })
